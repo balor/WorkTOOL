@@ -1,0 +1,14 @@
+WorkTOOL
+Simple tool that helps work in home.
+For now just readonly app, need to edit hour log file from hand.
+
+Features:
+    - parsing hour log file
+    - listing months
+    - listing hours in months with searcher
+    - summarizing months with searcher
+Todo:
+    - timer with to-hour converter and pause/stop/resume controls
+    - option to add record to month
+    - option to delete record from month
+    - option to edit record from month
