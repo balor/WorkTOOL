@@ -1,5 +1,10 @@
 WorkTOOL
-Simple tool that helps work in home.
+Author: Michał [balor] Thoma - http://balor.pl
+
+While riding a train and got nothing to do (no internet) i wrote up this simple python script to help myself work@home and maybe other people working like me. Program runs where python runs, and is designed to be minimal (not some big, graphical PIM software with DB etc.).
+
+I often work in home and get cash for every hour i work. I was writing to file how many hours I was working on each day, and after the end of the month, I summerized it and count how much cash I need to beg out from company. That tool try to ease this process a bit do you DRY.
+
 For now just readonly app, need to edit hour log file from hand.
 
 Features:
@@ -7,6 +12,7 @@ Features:
     - listing months
     - listing hours in months with searcher
     - summarizing months with searcher
+
 Todo:
     - timer with to-hour converter and pause/stop/resume controls
     - option to add record to month
