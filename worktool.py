@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 '''
-Tool for freelance working
+Tool for tine-based work@home
 Author: Michał [balor] Thoma - http://balor.pl
-Features:
-   - Workhours tracking with comments, stored in userfriendly text file
-   - Time tracking (additive timer)
-   - Month summary generation
 '''
+
+from optparse import OptionParser
+
+parser = OptionParser()
+(options, params) = parser.parse_args()
 
 def mergeStrListFromIndex(data, index = 0, mergechar = ' '):
     if index >= len(data):
@@ -35,8 +36,16 @@ def parseHourLine(line):
 
     return data
 
-def getHoursData(filename = 'hours.txt'):
-    f = open(filename)
+def getHoursData():
+    filename = 'hours.txt'
+    if len(params) > 0:
+        filename = params[0]
+    try:
+        f = open(filename)
+    except IOError, e:
+        print 'Can\' open file ' + filename + ', I\'m dying.. :('
+        exit()
+
     data = dict()
     lastCat = None
     for line in f:
@@ -84,8 +93,7 @@ def showHourTable(filter = None):
                 print '    Comment: ' + hval['comment']
 
 def generateSummaries(filter = None):
-
-    #TODO: constants!
+    #TODO: should be in config file!!
     monthlyWorkDays = 20
     hoursPerDay = 6
     paymentPerHour = 41.66
@@ -128,7 +136,6 @@ while (programRunning):
         endProgram()
     except KeyboardInterrupt, e:
         endProgram()
-
 
     chunks = command.split(' ')
     command = chunks[0]
