@@ -43,7 +43,7 @@ def getHoursData():
     try:
         f = open(filename)
     except IOError, e:
-        print 'Can\' open file ' + filename + ', I\'m dying.. :('
+        print 'Can\' open file %s, I\'m dying.. :(' % filename
         exit()
 
     data = dict()
@@ -88,7 +88,7 @@ def showHourTable(filter = None):
         print '\n\n' + key
         print '----------------'
         for (hkey, hval) in val.items():
-            print '  ' + hkey + ' = ' + hval['hours'] + ' hours'
+            print '  %s = %s hours' % (hkey, hval['hours'])
             if hval.has_key('comment'):
                 print '    Comment: ' + hval['comment']
 
@@ -108,11 +108,11 @@ def generateSummaries(filter = None):
             dayNum += 1
             if hval['hours'].isdigit():
                 hoursWorked += int(hval['hours'])
-        print 'Days worked: ' + str(dayNum) + '/' + str(monthlyWorkDays)
-        print 'Hours worked: ' + str(hoursWorked) + '/' + str(monthlyWorkDays * hoursPerDay)
-        print 'Average hours per day: ' + str(round(hoursWorked/dayNum, 2)) + ' hours'
-        print 'Average hours per month working day: ' + str(round(hoursWorked/monthlyWorkDays, 2)) + ' hours'
-        print 'Cash for the work: ' + str(round(hoursWorked*paymentPerHour)) + ' PLN'
+        print 'Days worked: %s/%s' % (dayNum, monthlyWorkDays)
+        print 'Hours worked: %s/%s' % (hoursWorked, (monthlyWorkDays * hoursPerDay))
+        print 'Average hours per day: %s hours' % round(hoursWorked/dayNum, 2)
+        print 'Average hours per month working day: %s hours' % round(hoursWorked/monthlyWorkDays, 2)
+        print 'Cash for the work: %s PLN' % round(hoursWorked*paymentPerHour)
         print ''
 
 def listMonths():
@@ -143,7 +143,7 @@ while (programRunning):
     if (len(chunks) > 1):
         param = chunks[1]
 
-    if command == 'quit' or command == 'exit':
+    if command in ('quit', 'exit'):
         endProgram()
     elif command == 'help':
         showHelp()
