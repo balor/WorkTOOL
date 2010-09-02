@@ -3,15 +3,17 @@ Author: Michał [balor] Thoma - http://balor.pl
 
 While riding a train and got nothing to do (no internet) i wrote up this simple python script to help myself work@home and maybe other people working like me. Program runs where python runs, and is designed to be minimal (not some big, graphical PIM software with DB etc.).
 
-I often work in home and get cash for every hour i work. I was writing to file how many hours I was working on each day, and after the end of the month, I summerized it and count how much cash I need to beg out from company. That tool try to ease this process a bit do you DRY.
+I often work in home and get cash for every hour i work. I was writing to file how many hours I was working on each day, and after the end of the month, I summerized it and count how much cash I need to beg out from company. That tool try to ease this process.
 
-For now just readonly app, need to edit hour log file from hand.
+For now just readonly app, need to edit hour log file from hand (that's not hard because all data is in human readable format).
+
+For log file format see 'hours.txt'. Also run worktool WorkTOOL on this file and play to see the features. WorkTOOL is so small and simple that it don't need manual imho.
 
 Features:
     - parsing hour log file
     - listing months
-    - listing hours in months with searcher
-    - summarizing months with searcher
+    - listing hours in months with search
+    - summarizing months with search
 
 Todo:
     - timer with to-hour converter and pause/stop/resume controls
