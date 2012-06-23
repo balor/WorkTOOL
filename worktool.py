@@ -1,160 +1,197 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 '''
-Tool for tine-based work@home
+Tool for time-based work@home
 Author: Michał [balor] Thoma - http://balor.pl
 '''
+
+
+WORK_DAYS_PER_MONTH = 20
+HOURS_PER_WORK_DAY = 8
+CASH_PER_HOUR = 41.66
+TAX_RATE = 1.09
+FILENAME = './hours.txt'
+
 
 from optparse import OptionParser
 
 parser = OptionParser()
 (options, params) = parser.parse_args()
 
-def mergeStrListFromIndex(data, index = 0, mergechar = ' '):
+
+def merge_str_list_from_index(data, index=0, mergechar=' '):
     if index >= len(data):
         return str()
-    if index == len(data)-1:
+
+    if index == len(data) - 1:
         return data[index]
+
     string = ''
-    for x in range(index, len(data)-1):
+    for x in range(index, len(data) - 1):
         if string != '':
             string += mergechar
         string += data[x]
+
     return string
 
-def parseHourLine(line):
+
+def parse_hour_line(line):
     data = dict()
     chunks = line.split('-')
+
     if len(chunks) < 2:
         return None
 
     data['key'] = chunks[0].strip()
-    data['hours'] = chunks[1].strip().split(' ')[0]
+    try:
+        data['hours'] = float(chunks[1].strip().split(' ')[0])
+    except:
+        print chunks[1].strip().split(' ')[0]
+
     if len(chunks) > 2:
-        data['comment'] = mergeStrListFromIndex(chunks, 2, '-')
+        data['comment'] = merge_str_list_from_index(chunks, 2, '-')
 
     return data
 
-def getHoursData():
-    filename = 'hours.txt'
+
+def get_hours_data():
     if len(params) > 0:
         filename = params[0]
+    else:
+        filename = FILENAME
+
     try:
         f = open(filename)
     except IOError, e:
-        print 'Can\' open file %s, I\'m dying.. :(' % filename
+        print 'Can\'t open file {0}, I\'m dying.. :('.format(filename)
         exit()
 
     data = dict()
-    lastCat = None
+    last_cat = None
     for line in f:
         line = line.strip()
+
         if line.startswith('%'):
             line = line[1:]
+
             if not data.has_key(line):
                 data[line] = dict()
-            lastCat = line
-        elif line != '':
-            parsedLine = parseHourLine(line)
-            if parsedLine and lastCat:
-                data[lastCat][parsedLine['key']] = parsedLine
+
+            last_cat = line
+        elif line:
+            parsed_line = parse_hour_line(line)
+            if parsed_line and last_cat:
+                data[last_cat][parsed_line['key']] = parsed_line
     f.close()
     return data
 
-def showHelp():
-    print '\nCommands:'
-    print 'clear - clear the screen'
-    print 'exit - exit the program'
-    print 'help - show availible commands'
-    print 'hours [filter] - show hourtable'
-    print 'ls - list all months'
-    print 'quit - exit the program'
-    print 'sum [filter] - generate summary'
-    print ''
+
+def show_help():
+    print '''
+    Commands:
+    clear - clear the screen
+    exit - exit the program
+    help - show availible commands
+    hours [filter], cat [filter] - show hourtable
+    ls - list all months
+    sum [filter] - generate summary
+    '''
+
 
 def wildcardize(data, wildcard = None):
     if not wildcard or wildcard.strip() == '':
         return data
+
     trimmedData = dict()
     for (key, val) in data.items():
+        key = key.lower()
+        wildcard = wildcard.lower()
         if key.find(wildcard) != -1:
             trimmedData[key] = val
+
     return trimmedData
 
-def showHourTable(filter = None):
-    hours = wildcardize(getHoursData(), filter)
+
+def show_hour_table(filter = None):
+    hours = wildcardize(get_hours_data(), filter)
     for (key, val) in hours.items():
-        print '\n\n' + key
+        print '\n\n{0}'.format(key)
         print '----------------'
         for (hkey, hval) in val.items():
-            print '  %s = %s hours' % (hkey, hval['hours'])
+            print '  {0} = {1} hours'.format(hkey, hval['hours'])
             if hval.has_key('comment'):
-                print '    Comment: ' + hval['comment']
+                print '    Comment: {0}'.format(hval['comment'])
 
-def generateSummaries(filter = None):
-    #TODO: should be in config file!!
-    monthlyWorkDays = 20
-    hoursPerDay = 6
-    paymentPerHour = 41.66
 
-    hours = wildcardize(getHoursData(), filter)
+def generate_summaries(filter = None):
+    hours = wildcardize(get_hours_data(), filter)
     for (key, val) in hours.items():
-        print '\n' + key
-        print '----------------'
-        dayNum = 0
-        hoursWorked = 0
+        print '\n{0}\n----------------'.format(key)
+
+        day_num = 0
+        hours_worked = 0.0
         for (hkey, hval) in val.items():
-            dayNum += 1
-            if hval['hours'].isdigit():
-                hoursWorked += int(hval['hours'])
-        print 'Days worked: %s/%s' % (dayNum, monthlyWorkDays)
-        print 'Hours worked: %s/%s' % (hoursWorked, (monthlyWorkDays * hoursPerDay))
-        print 'Average hours per day: %s hours' % round(hoursWorked/dayNum, 2)
-        print 'Average hours per month working day: %s hours' % round(hoursWorked/monthlyWorkDays, 2)
-        print 'Cash for the work: %s PLN' % round(hoursWorked*paymentPerHour)
+            day_num += 1
+            hours_worked += hval['hours']
+
+        print 'Days worked: {0}/{1}'.format(
+            day_num, WORK_DAYS_PER_MONTH)
+        print 'Hours worked: {0}/{1}'.format(
+            hours_worked, WORK_DAYS_PER_MONTH * HOURS_PER_WORK_DAY)
+        print 'Average hours per day: {0} hours'.format(
+            round(hours_worked / float(day_num), 2))
+        print 'Average hours per working day: {0} hours'.format(
+            round(hours_worked / float(WORK_DAYS_PER_MONTH), 2))
+        cash_gross = hours_worked * CASH_PER_HOUR
+        print 'Cash for the work: {0} PLN (gross)'.format(
+            round(cash_gross, 2))
+        print '                   {0} PLN (net)'.format(
+            round(cash_gross / TAX_RATE, 2))
         print ''
 
-def listMonths():
-    hours = getHoursData()
+
+def list_months():
+    hours = get_hours_data()
     print '\n'
     for (key, val) in hours.items():
         print key + '\n'
 
-def endProgram():
+
+def end_program():
     print '\n\nBye bye..'
-    exit()
+    exit(0)
 
-print 'Welcome to WorkTOOL\n'
-print 'type help to show availible commands\n'
 
-programRunning = True
-while (programRunning):
+def clear_screen():
+    print 80*'\n'
+
+
+print '''Welcome to WorkTOOL
+type `help` to show availible commands\n'''
+
+actions = {
+    'exit': end_program,
+    'help': show_help,
+    'hours': show_hour_table,
+    'cat': show_hour_table,
+    'sum': generate_summaries,
+    'clear': clear_screen,
+    'ls': list_months,
+}
+
+while True:
     try:
         command = raw_input('> ')
-    except Exception, e:
-        endProgram()
-    except KeyboardInterrupt, e:
-        endProgram()
+    except (Exception, KeyboardInterrupt):
+        actions['exit']()
 
     chunks = command.split(' ')
     command = chunks[0]
-    param = None
-    if (len(chunks) > 1):
-        param = chunks[1]
+    args = chunks[1:]
 
-    if command in ('quit', 'exit'):
-        endProgram()
-    elif command == 'help':
-        showHelp()
-    elif command == 'hours':
-        showHourTable(param)
-    elif command == 'sum':
-        generateSummaries(param)
-    elif command == 'clear':
-        print 200 * '\n'
-    elif command == 'ls':
-        listMonths()
-    else:
-        print 'Unknown command :S'
+    try:
+        actions[command](*args)
+    except (TypeError, KeyError):
+        print 'Unknown command :<'
 
